@@ -143,7 +143,6 @@ class DB {
      */
     update(instance) {
 
-        instance.db = null; // Esto es necesario ya que la instancia posee un parámetro db, el cual no puede ser almacenado por IndexedDB
         return this.#connection.put(instance.table_name, instance);
     }
 
@@ -153,7 +152,6 @@ class DB {
      */
     remove(instance) {
 
-        instance.db = null; // Esto es necesario ya que la instancia posee un parámetro db, el cual no puede ser almacenado por IndexedDB
         return this.#connection.delete(instance.table_name, instance.id);
     }
 
@@ -172,7 +170,6 @@ class DB {
      * @param {Model[]} array - array de elementos a almacenar
      */
     store(table, array) {
-
         let tx = this.tx(table, this.TRANSACTION_MODE.escritura);
         Promise.all(array.map(function (e) {
             return tx.store.add(e);

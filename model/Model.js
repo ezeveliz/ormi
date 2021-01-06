@@ -280,9 +280,7 @@ class Model {
      */
     static instantiate(object = null) {
         if (object !== null) {
-            let instance = new (MetaData.getClass(this.name))(object);
-            instance.db = this.db;
-            return instance;
+            return new (MetaData.getClass(this.name))(object);
         }
         return new (MetaData.getClass(this.name))();
 
@@ -302,7 +300,7 @@ class Model {
      * @returns {Promise<*>}
      */
     update() {
-        return this.db.update(this);
+        return this.constructor.db.update(this);
     }
 
     /**
@@ -321,7 +319,7 @@ class Model {
      * @returns {Promise<*>}
      */
     remove() {
-        return this.db.remove(this);
+        return this.constructor.db.remove(this);
     }
 
     // Obtengo todos los elementos de una clase dada y los elimino de IndexedDB
