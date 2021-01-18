@@ -1,8 +1,27 @@
+import * as idb from "idb";
+import {Migration} from "../migration/Migration";
+
+export class Connection {
+    /**
+     *
+     * @param {string} db_name
+     * @param {Migration} migration
+     * @returns {Promise<IDBDatabase>}
+     */
+    async constructor(db_name, migration) {
+        return await idb.openDB(db_name, migration.version, {
+            upgrade(database, oldVersion, newVersion, transaction) {
+                migration.run(database, oldVersion, newVersion, transaction);
+            }
+        });
+    }
+}
+
 /**
  * Wrapper de la biblioteca idb, posee una lista de métodos para simplificar el uso de la misma y una conexión
  * a indexeddb
  */
-class DB {
+export class DB {
 
     /**
      * @typedef {string} EXTREMOS
@@ -196,5 +215,3 @@ class DB {
         }
     }
 }
-
-export {DB};

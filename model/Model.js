@@ -4,7 +4,7 @@ import {DB} from "../db/DB";
  * Objeto que contiene información sobre las distintas clases, un método para registrar una clase, otro para
  * obtener una clase y otro para limpiar las tablas asociadas a las clases registradas
  */
-let MetaData = {
+export let MetaData = {
     /**
      * Objeto que mapea una clase con su nombre correspondiente
      * @type {Map<string, typeof Model>}
@@ -63,7 +63,7 @@ let MetaData = {
 /**
  * Clase que debera ser extendida por todas las clases que quieran trabajar sobre indexedDB
  */
-class Model {
+export class Model {
 
     static _db;
 
@@ -397,7 +397,3 @@ class Model {
         });
     }
 }
-
-export {MetaData};
-
-export {Model};
