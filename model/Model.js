@@ -94,7 +94,7 @@ export class Model {
             if (this.prototype instanceof Model) {
                 this._db = db;
             } else {
-                throw new Error('No se que es esto pero no va a funcionar si no extendes de la clase Model o no sos la clase Model.');
+                throw new Error('No sé que es esto pero no va a funcionar si no extendes de la clase Model o no sos la clase Model.');
             }
         } else {
             throw new Error('La DB proporcionada debe ser una instancia de la clase DB.');
@@ -140,7 +140,7 @@ export class Model {
     }
 
     /**
-     * Tabla para representar a la clase en la db, DEBE ser sobre escrita por la clase que me extiende
+     * Tabla para representar a la clase en la db, DEBE ser sobreescrita por la clase que me extiende
      * @property {string}
      */
     static get table() {
@@ -184,8 +184,8 @@ export class Model {
 
     /**
      * Obtengo las entradas de una tabla que correspondan con un index y key dados
-     * @param {string} index - nombre del indice
-     * @param {string|number} key - valor del indice
+     * @param {string} index - nombre del índice
+     * @param {string|number} key - valor del índice
      * @returns {Promise<*>}
      */
     static async allFromIndex(index, key) {
@@ -210,7 +210,7 @@ export class Model {
     }
 
     /**
-     * Obtengo un objeto de la db y lo instancio en su clase correspondiente, puedo especificar el indice, por
+     * Obtengo un objeto de la db y lo instancio en su clase correspondiente, puedo especificar el índice, por
      * default es 'id'
      * @param {string|number} id - id a obtener
      * @param {string} [index='id'] - indice por el cual se consulta el id
@@ -235,9 +235,9 @@ export class Model {
     }
 
     /**
-     * Obtengo la cantidad de entradas en un tabla, dado un indice y una key
-     * @param {string} index - nombre del indice
-     * @param key - valor del indice
+     * Obtengo la cantidad de entradas en una tabla, dado un índice y una key
+     * @param {string} index - nombre del índice
+     * @param key - valor del índice
      * @returns {Promise<number>}
      */
     static countFromIndex(index, key) {
@@ -248,9 +248,9 @@ export class Model {
     }
 
     /**
-     * Obtengo la ultima entrada de una tabla dado un indice
-     * * Si la tabla esta vacía, retorno una instancia vacía
-     * * Si la tabla tiene elementos, retorno una instancia del ultimo
+     * Obtengo la última entrada de una tabla dado un índice
+     * * Si la tabla está vacía, retorno una instancia vacía
+     * * Si la tabla tiene elementos, retorno una instancia del último
      * @param {string} [index='id'] - indice por el cual se itera
      * @returns {Promise<*>}
      */
@@ -261,8 +261,8 @@ export class Model {
     }
 
     /**
-     * Obtengo la primera entrada de una tabla dado un indice
-     * * Si la tabla esta vacía, retorno una instancia vacía
+     * Obtengo la primera entrada de una tabla dado un índice
+     * * Si la tabla está vacía, retorno una instancia vacía
      * * Si la tabla tiene elementos, retorno una instancia del primero
      * @param {string} [index='id'] - indice por el cual se itera
      * @returns {Promise<*>}
@@ -306,7 +306,7 @@ export class Model {
     /**
      * Quito un registro de la DB dado su id correspondiente
      * @param {string|number} id - id a obtener
-     * @param {string} [index='id'] - indice por el cual se consulta el id
+     * @param {string} [index='id'] - indicé por el cual se consulta el id
      * @returns {Promise<*>}
      */
     static remove(id, index = 'id') {
@@ -345,8 +345,8 @@ export class Model {
     }
 
     /**
-     * Verifico si una instancia esta persistida en el servidor
-     * * Cuando el id es menor a 0, solo esta persistida localmente
+     * Verifico si una instancia está persistida en el servidor
+     * * Cuando el id es menor a 0, solo está persistida localmente
      * * Cuando es mayor, ya se persistió en el servidor y tanto la copia local como la del servidor poseen el
      * mismo id
      * @returns {boolean}
@@ -365,9 +365,9 @@ export class Model {
     }
 
     /**
-     * Verifico si una instancia de una clase existe, existe cuando no esta vacia,
+     * Verifico si una instancia de una clase existe, existe cuando no está vacía,
      * esto puede suceder cuando al consultar indexedDB por una key, resulto que
-     * la key no existe, por lo que te devuelve una instancia de la clase correspondiente vacia
+     * la key no existe, por lo que te devuelve una instancia de la clase correspondiente vacía
      * @returns {boolean}
      */
     exists() {

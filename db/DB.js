@@ -1,21 +1,4 @@
 import * as idb from "idb";
-import {Migration} from "../migration/Migration";
-
-export class Connection {
-    /**
-     *
-     * @param {string} db_name
-     * @param {Migration} migration
-     * @returns {Promise<IDBDatabase>}
-     */
-    async constructor(db_name, migration) {
-        return await idb.openDB(db_name, migration.version, {
-            upgrade(database, oldVersion, newVersion, transaction) {
-                migration.run(database, oldVersion, newVersion, transaction);
-            }
-        });
-    }
-}
 
 /**
  * Wrapper de la biblioteca idb, posee una lista de métodos para simplificar el uso de la misma y una conexión
@@ -54,6 +37,61 @@ export class DB {
         /** Transacción en modo lectoescritura */
         escritura: 'readwrite'
     });
+
+    /** @type {IDBDatabase} */
+    #_connection;
+    /** @type {string} */
+    #_nombre;
+    /** @type {number} */
+    #_version;
+    /** @type {MigrationVersion[]} */
+    #_migrations = [];
+
+    /** @returns {IDBDatabase} */
+    get #connection() {
+        return this.#_connection;
+    }
+
+    set #connection(value) {
+        this.#_connection = value;
+    }
+
+    /** @param {string} value */
+    set #nombre(value) {
+        this.#_nombre = value;
+    }
+
+    /** @returns {string} */
+    get #nombre() {
+        return this.#_nombre;
+    }
+
+    /** @returns {number} */
+    get #version() {
+        return this.#_version;
+    }
+
+    /** @param {number} value */
+    set #version(value) {
+        this.#_version = value;
+    }
+
+    /** @returns {MigrationVersion[]} */
+    get #migrations() {
+        return this.#_migrations;
+    }
+
+    /**
+     * Agrego una nueva migración a la db
+     * @param {MigrationVersion} migration
+     * @returns {DB}
+     */
+    addMigration(migration) {
+        migration.version = this.#version;
+        this.#version ++;
+        this.#_migrations.push(migration);
+        return this;
+    }
 
     /**
      * @param {string} table - tabla sobre la cual se abre la transacción
@@ -196,22 +234,53 @@ export class DB {
         return tx.done;
     }
 
-    /** @returns {IDBDatabase} */
-    get #connection() {
-        return this._connection;
+    /**
+     *
+     * @param {string} nombre - Nombre de la db a la cual conectarse
+     * @param {number} [version=1] - Version inicial de la DB
+     * @returns {DB}
+     * @private
+     */
+    constructor(nombre, version = 1) {
+
+        if (typeof nombre !== 'undefined') {
+            this.#nombre = nombre;
+            this.#version = version;
+            return this;
+        }
+        throw new Error('Tenes que darme el nombre de la DB');
     }
 
     /**
-     * @param {IDBDatabase} connection - conexión a la db de indexedDB
-     * @throws {Error} - Para instanciar debo pasar una conexión
+     * Me conecto a la base de datos
+     * @returns {Promise<void>}
      */
-    constructor(connection) {
+    async conectar() {
 
-        if (connection !== null && connection instanceof IDBDatabase) {
+        if (this.#migrations.length > 0) {
+            this.#connection = await idb.openDB(this.#nombre, this.#version, {
+                upgrade(database, oldVersion, newVersion, transaction) {
+                    this.#migrar(database, oldVersion, newVersion, transaction);
+                }
+            });
+            return;
+        }
+        throw new Error('No me asignaste ninguna migracion');
+    }
 
-            this._connection = connection;
-        } else {
-            throw new Error('Para instanciar una nueva DB, tenes que pasarle una conexión a una IDBDatabase');
+    /**
+     * Corro las migraciones
+     * @param {IDBDatabase} db
+     * @param {number} oldVersion
+     * @param {number} newVersion
+     * @param {IDBTransaction} transaction
+     */
+    #migrar(db, oldVersion, newVersion, transaction) {
+        for (let migration of this.#migrations) {
+
+            if ( oldVersion < migration.version ) {
+                migration.run(db, transaction);
+            }
         }
     }
 }

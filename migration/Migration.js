@@ -1,72 +1,5 @@
 import {Model} from "../model/Model";
 
-export class Migration {
-
-    /** @type {string} */
-    #_name;
-    /** @type {number} */
-    #_version;
-    /** @type {MigrationVersion[]} */
-    #_migrations = [];
-
-    /** @param {string} value */
-    set #name(value) {
-        this.#_name = value;
-    }
-
-    /** @returns {number} */
-    get version() {
-        return this.#_version;
-    }
-
-    /** @param {number} value */
-    set #version(value) {
-        this.#_version = value;
-    }
-
-    /** @returns {MigrationVersion[]} */
-    get #migrations() {
-        return this.#_migrations;
-    }
-
-    /**
-     * @param {number} version
-     * @returns {Migration}
-     */
-    constructor(version) {
-        this.#version = version;
-        return this;
-    }
-
-    /**
-     * Agrego una nueva version a la migracion
-     * @param {MigrationVersion} migration
-     * @returns {Migration}
-     */
-    add(migration) {
-        migration.version = this.version;
-        this.#version = this.version + 1;
-        this.#_migrations.push(migration);
-        return this;
-    }
-
-    /**
-     * Corro las migraciones
-     * @param {IDBDatabase} db
-     * @param {number} oldVersion
-     * @param {number} newVersion
-     * @param {IDBTransaction} transaction
-     */
-    run(db, oldVersion, newVersion, transaction) {
-        for (let migration of this.#migrations) {
-
-            if ( oldVersion < migration.version ) {
-                migration.run(db, transaction);
-            }
-        }
-    }
-}
-
 export class MigrationVersion {
 
     #TYPE_OF_TASK = Object.freeze({
@@ -90,7 +23,7 @@ export class MigrationVersion {
     }
 
     /**
-     * Agrego una nueva tabla con sus indices si los proporciona
+     * Agrego una nueva tabla con sus índices si los proporciona
      * @param {typeof Model|string} model
      * @param {string} [key='id']
      * @param {boolean} [autoincrement=true]
@@ -101,7 +34,7 @@ export class MigrationVersion {
 
         task.type = this.#TYPE_OF_TASK.new_table;
         if (model.prototype instanceof Model) {
-            task.table = model.table;
+            task.table = model.table_name;
         } else {
             task.table = model;
         }
@@ -123,7 +56,7 @@ export class MigrationVersion {
 
         task.type = this.#TYPE_OF_TASK.new_index;
         if (model.prototype instanceof Model) {
-            task.table = model.table;
+            task.table = model.table_name;
         } else {
             task.table = model;
         }

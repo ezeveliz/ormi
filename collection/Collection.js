@@ -1,5 +1,4 @@
-//
-class Collection {
+export class Collection {
 
     get elements() {
         return this._elements;
