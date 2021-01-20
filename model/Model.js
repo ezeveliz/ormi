@@ -13,15 +13,19 @@ export let MetaData = {
     /**
      * Registro una clase dada en mi lista de clases
      * @param {typeof Model} clase - Clase a registrar
-     * @throws {Error} Revolea un error si la clase que extiende no tiene definida la propiedad estática table
+     * @throws {Error} Revolea un error si la clase que extiende no tiene definida la propiedad estática table_name y class_name
      * o si no extiende a Model.
      */
     registerClass: function (clase) {
         if (clase.prototype instanceof Model) {
-            if (typeof clase.table !== 'undefined' && clase.table.localeCompare('Model') !== 0) {
-                this.clases.set(clase.name, clase);
+            if (typeof clase.table_name !== 'undefined' && clase.table_name.localeCompare('Model') !== 0) {
+                if (typeof clase.class_name !== 'undefined' && clase.class_name.localeCompare('Model') !== 0) {
+                    this.clases.set(clase.class_name, clase);
+                } else {
+                    throw new Error('La clase debe sobreescribir la propiedad estática class con el nombre correspondiente a la clase.');
+                }
             } else {
-                throw new Error('La clase debe sobreescribir la propiedad estática table');
+                throw new Error('La clase debe sobreescribir la propiedad estática table con el nombre correspondiente a la tabla que representa a la clase en la db.');
             }
         } else {
             throw new Error('La clase a registrar debe extender la clase base Model');
@@ -86,11 +90,13 @@ export class Model {
     static set db(db) {
 
         if (db !== null && db instanceof DB) {
-            if (this.name === 'Model') {
+
+            if (this === Model) {
                 MetaData.setDB(db);
                 this._db = db;
                 return;
             }
+
             if (this.prototype instanceof Model) {
                 this._db = db;
             } else {
@@ -140,19 +146,43 @@ export class Model {
     }
 
     /**
-     * Tabla para representar a la clase en la db, DEBE ser sobreescrita por la clase que me extiende
-     * @property {string}
-     */
-    static get table() {
-        return 'Model';
-    }
-
-    /**
      * Registro a la clase que extiende ante el modelo
      * @throws Imprime un error si la clase que extiende no tiene definida la propiedad estática table
      */
     static register() {
         MetaData.registerClass(this);
+    }
+
+    /**
+     * Nombre de la clase, DEBE ser sobreescrita por la clase que me extiende
+     * @returns {string}
+     */
+    static get class() {
+        return 'Model'
+    }
+
+    /**
+     * Obtengo el nombre correspondiente de la clase desde una instancia
+     * @returns {string}
+     */
+    get class_name() {
+        return this.constructor.class
+    }
+
+    /**
+     * Obtengo el nombre correspondiente a la clase estáticamente
+     * @returns {string}
+     */
+    static get class_name() {
+        return this.class
+    }
+
+    /**
+     * Tabla para representar a la clase en la db, DEBE ser sobreescrita por la clase que me extiende
+     * @property {string}
+     */
+    static get table() {
+        return 'Model';
     }
 
     /**
@@ -280,9 +310,9 @@ export class Model {
      */
     static instantiate(object = null) {
         if (object !== null) {
-            return new (MetaData.getClass(this.name))(object);
+            return new this(object);
         }
-        return new (MetaData.getClass(this.name))();
+        return new this();
 
     }
 

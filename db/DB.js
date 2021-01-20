@@ -1,4 +1,5 @@
 import * as idb from "idb";
+import {MigrationVersion} from '../migration/Migration'
 
 /**
  * Wrapper de la biblioteca idb, posee una lista de métodos para simplificar el uso de la misma y una conexión
@@ -88,7 +89,7 @@ export class DB {
      */
     addMigration(migration) {
         migration.version = this.#version;
-        this.#version ++;
+        this.#version++;
         this.#_migrations.push(migration);
         return this;
     }
@@ -235,50 +236,51 @@ export class DB {
     }
 
     /**
-     *
      * @param {string} nombre - Nombre de la db a la cual conectarse
-     * @param {number} [version=1] - Version inicial de la DB
+     * @param {number} [version=0] - Version inicial de la DB
      * @returns {DB}
      * @private
      */
-    constructor(nombre, version = 1) {
+    constructor(nombre, version = 0) {
 
         if (typeof nombre !== 'undefined') {
             this.#nombre = nombre;
             this.#version = version;
             return this;
         }
-        throw new Error('Tenes que darme el nombre de la DB');
+        throw new Error('Para instanciar una db necesito su nombre');
     }
 
     /**
      * Me conecto a la base de datos
      * @returns {Promise<void>}
      */
-    async conectar() {
+    async connect() {
 
         if (this.#migrations.length > 0) {
+
+            let db = this;
             this.#connection = await idb.openDB(this.#nombre, this.#version, {
-                upgrade(database, oldVersion, newVersion, transaction) {
-                    this.#migrar(database, oldVersion, newVersion, transaction);
+                upgrade(database, old_version, new_version, transaction) {
+                    db.migrar(database, old_version, new_version, transaction);
                 }
             });
             return;
         }
-        throw new Error('No me asignaste ninguna migracion');
+        throw new Error('No me asignaste ninguna migración.');
     }
 
     /**
      * Corro las migraciones
      * @param {IDBDatabase} db
-     * @param {number} oldVersion
-     * @param {number} newVersion
+     * @param {number} old_version
+     * @param {number} new_version
      * @param {IDBTransaction} transaction
      */
-    #migrar(db, oldVersion, newVersion, transaction) {
+    migrar(db, old_version, new_version, transaction) {
         for (let migration of this.#migrations) {
 
-            if ( oldVersion < migration.version ) {
+            if (old_version < migration.version) {
                 migration.run(db, transaction);
             }
         }
