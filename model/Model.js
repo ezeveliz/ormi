@@ -5,6 +5,10 @@ import {DB} from "../db/DB";
  * obtener una clase y otro para limpiar las tablas asociadas a las clases registradas
  */
 export let MetaData = {
+
+    // Funciones del modelo que utilizan indices, se utiliza para generar los métodos mágicos
+    index_functions: ['allFromIndex', 'allFromIndexCursor', 'countFromIndex', 'last', 'first',],
+
     /**
      * Objeto que mapea una clase con su nombre correspondiente
      * @type {Map<string, typeof Model>}
@@ -61,7 +65,34 @@ export let MetaData = {
         } else {
             throw new Error('La DB proporcionada debe ser una instancia de la clase DB.');
         }
-    }
+    },
+
+    /**
+     * Genero métodos mágicos, son una extension de los métodos que utilizan indices, para no pasar el parámetro, el
+     * nombre del indice se incluye directo en el nombre del método
+     */
+    generateMagicMethods: function () {
+        for (let clase of this.clases.values()) {
+            for (let index of clase.indexes) {
+                for (let funct of this.index_functions) {
+                    clase[funct + this.capitalize(index)] = function (args) {
+                        if (args) {
+                            return clase[funct](index, ...arguments)
+                        }
+                        return clase[funct](index)
+                    };
+                }
+            }
+        }
+    },
+
+    capitalize: function (word) {
+        if (word && word.length > 0) {
+            let parts = word.split('_').map((part) => part.charAt(0).toUpperCase() + part.slice(1));
+            return parts.join('')
+        }
+        return word;
+    },
 };
 
 /**
@@ -143,6 +174,15 @@ export class Model {
         } else {
             throw new Error('La DB proporcionada debe ser una instancia de la clase DB.');
         }
+    }
+
+    /**
+     * Inicializo el modelo, seteo la db y genero los métodos mágicos
+     * @param db
+     */
+    static init(db) {
+        this.db = db;
+        MetaData.generateMagicMethods();
     }
 
     /**
