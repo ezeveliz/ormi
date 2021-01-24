@@ -35,6 +35,7 @@ export class MigrationVersion {
 
         if (model.prototype instanceof Model) {
             model.indexes = indexes;
+            model.key = key;
         }
 
         let task = {};

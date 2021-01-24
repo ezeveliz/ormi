@@ -66,7 +66,6 @@ export let MetaData = {
             throw new Error('La DB proporcionada debe ser una instancia de la clase DB.');
         }
     },
-
     /**
      * Genero métodos mágicos, son una extension de los métodos que utilizan indices, para no pasar el parámetro, el
      * nombre del indice se incluye directo en el nombre del método
@@ -103,12 +102,13 @@ export class Model {
     static _db;
 
     // Id con el que se almacena una entrada dada en la db
+    static key;
     get id() {
-        return this._id;
+        return this['_' + this.constructor.key];
     }
 
     set id(value) {
-        this._id = parseInt(value);
+        this['_' + this.constructor.key] = parseInt(value);
     }
 
     /**
@@ -286,7 +286,7 @@ export class Model {
      * @param {string} [index='id'] - indice por el cual se consulta el id
      * @returns {Promise<*>}
      */
-    static get(id, index = 'id') {
+    static get(id, index = this.key) {
 
         return this.db.getByIndex(this.table_name, index, id).then(function (obj) {
             return this.instantiate(obj);
@@ -324,7 +324,7 @@ export class Model {
      * @param {string} [index='id'] - indice por el cual se itera
      * @returns {Promise<*>}
      */
-    static last(index = 'id') {
+    static last(index = this.key) {
         return this.db.getMaxFromIndex(this.table_name, index).then(function (obj) {
             return this.instantiate(obj ? obj.value : null);
         }.bind(this));
@@ -337,7 +337,7 @@ export class Model {
      * @param {string} [index='id'] - indice por el cual se itera
      * @returns {Promise<*>}
      */
-    static first(index = 'id') {
+    static first(index = this.key) {
         return this.db.getMinFromIndex(this.table_name, index).then(function (obj) {
             return this.instantiate(obj ? obj.value : null);
         }.bind(this));
@@ -379,7 +379,7 @@ export class Model {
      * @param {string} [index='id'] - indicé por el cual se consulta el id
      * @returns {Promise<*>}
      */
-    static remove(id, index = 'id') {
+    static remove(id, index = this.key) {
         let instance = this.get(id, index);
         return instance.remove();
     }
