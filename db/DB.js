@@ -280,7 +280,7 @@ export class DB {
     migrar(db, old_version, new_version, transaction) {
         for (let migration of this.#migrations) {
 
-            if (old_version < migration.version) {
+            if (old_version < migration.version - 1) {
                 migration.run(db, transaction);
             }
         }
