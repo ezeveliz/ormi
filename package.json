@@ -2,6 +2,6 @@
   "name": "ormi",
   "version": "1.0.0",
   "dependencies": {
-    "idb": "^5.0.7"
+    "idb": "6.1.2"
   }
 }
