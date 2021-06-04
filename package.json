@@ -2,6 +2,15 @@
   "name": "ormi",
   "version": "1.0.0",
   "dependencies": {
-    "idb": "^5.0.7"
-  }
+    "idb": "^6.1.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ezeveliz/arbil.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ezeveliz/ormi/issues"
+  },
+  "homepage": "https://github.com/ezeveliz/ormi#readme"
 }

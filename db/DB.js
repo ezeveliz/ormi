@@ -263,6 +263,9 @@ export class DB {
             this.#connection = await idb.openDB(this.#nombre, this.#version, {
                 upgrade(database, old_version, new_version, transaction) {
                     db.migrar(database, old_version, new_version, transaction);
+                },
+                terminated() {
+                    window.dispatchEvent(new CustomEvent('db-destroyed', { bubbles: true, detail: 'DB destruida' }));
                 }
             });
             return;

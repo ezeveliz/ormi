@@ -22,8 +22,8 @@ export let MetaData = {
      */
     registerClass: function (clase) {
         if (clase.prototype instanceof Model) {
-            if (typeof clase.table_name !== 'undefined' && clase.table_name.localeCompare('Model') !== 0) {
-                if (typeof clase.class_name !== 'undefined' && clase.class_name.localeCompare('Model') !== 0) {
+            if (typeof clase.table_name !== 'undefined' && clase.table_name.localeCompare(Model.table_name) !== 0) {
+                if (typeof clase.class_name !== 'undefined' && clase.class_name.localeCompare(Model.class_name) !== 0) {
                     this.clases.set(clase.class_name, clase);
                 } else {
                     throw new Error('La clase debe sobreescribir la propiedad estática class con el nombre correspondiente a la clase.');
@@ -102,7 +102,7 @@ export class Model {
     static _db;
 
     // Id con el que se almacena una entrada dada en la db
-    static key;
+    static key = 'id';
     get id() {
         return this['_' + this.constructor.key];
     }
