@@ -2,7 +2,7 @@
   "name": "ormi",
   "version": "1.0.0",
   "dependencies": {
-    "idb": "^7.0.0"
+    "idb": "7.0.1"
   },
   "repository": {
     "type": "git",
